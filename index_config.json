@@ -1,0 +1,52 @@
+{
+    "title": "MIFENG CDN代理服务",
+    "description": "高性能多源CDN代理解决方案",
+    "footer": "© 2025 Mifeng CDN服务 | 提供稳定快速的资源访问",
+    "establishTime": "2025/01/13/08/00",
+    "forceInlineImages": true,
+    "host": "localhost",
+    "port": 3000,
+    "cache": {
+        "enabled": true,
+        "type": "disk",
+        "minSize": "5MB",
+        "maxTime": "2678400S",
+        "maxSize": "1024MB",
+        "diskPath": ".cache",
+        "imageTypes": ["png", "jpg", "jpeg", "gif", "svg", "webp", "bmp", "ico"]
+    },
+    "httpProxy": {
+        "enabled": false,
+        "address": "127.0.0.1",
+        "port": 10809,
+        "username": "",
+        "password": "",
+        "rejectUnauthorized": false
+    },
+    "proxies": [
+        {
+            "prefix": "/imlazy/",
+            "target": "https://cdn.imlazy.ink:233/img/background/",
+            "rawRedirect": "https://cdn.imlazy.ink:233/img/background/{path}",
+            "description": "个人图床服务(非本人图床，仅作反代并缓存)",
+            "visible": false,
+            "useProxy": false
+        },
+        {
+            "prefix": "/image-oss/",
+            "target": "https://cdn.statically.io/gh/FrecklyComb1728/image-oss@master/",
+            "rawRedirect": "https://cdn.jsdmirror.cn/gh/FrecklyComb1728/image-oss@master/{path}",
+            "description": "个人GitHub OSS图片镜像",
+            "visible": true,
+            "useProxy": true
+        },
+        {
+            "prefix": "/gh/",
+            "target": "http://cdn.statically.io/gh/",
+            "rawRedirect": "https://cdn.jsdmirror.cn/gh/{path}",
+            "description": "statically反代(类jsdelivr静态文件加速)",
+            "visible": true,
+            "useProxy": true
+        }
+    ]
+}
