@@ -17,11 +17,6 @@ const CONFIG_HTML_FILE = join(__dirname, "public", "list.html");
 const CONFIG_FILE = join(__dirname, "index_config.json");
 const CONFIG_ENDPOINT = "/list";
 
-if (process.env.CF_WORKER === '1') {
-  console.log('Detected Cloudflare Worker environment. Exiting...');
-  process.exit(0);
-}
-
 const app = express();
 const fallbackConfig = {
   title: "MIFENG CDN代理服务",
