@@ -1,0 +1,20 @@
+{
+  "name": "nodeproxy",
+  "main": "index.js",
+  "compatibility_date": "2025-06-28",
+  "type": "javascript",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "*example.com/*",
+      "zone_id": "<your-zone-id>"
+    }
+  ],
+  "env": {
+    "production": {
+      "vars": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
