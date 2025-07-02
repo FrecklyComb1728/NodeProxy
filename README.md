@@ -33,4 +33,20 @@ npm start
 - 灵活的代理规则配置
 - 支持多个CDN源
 - HTML和JSON格式的配置查看界面
+- 路径别名支持，一个代理可以通过多个路径访问
+
+## 路径别名使用
+
+在`index_config.json`的代理配置中，可以为每个代理设置别名：
+
+```json
+{
+  "prefix": "/oss/",
+  "aliases": ["/img/", "/images/"],
+  "target": "https://your-cdn-url.com/path/",
+  ...
+}
+```
+
+通过这种方式，不仅可以通过`/oss/image.png`访问图片，还可以使用`/img/image.png`或`/images/image.png`访问相同的资源。
 

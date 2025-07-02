@@ -127,13 +127,31 @@ export default function proxyRoute(app, config, cacheHeaders, imageCache) {
             console.log(`[请求] 路径: ${req.path}, 原始URL: ${req.originalUrl}, 方法: ${req.method}`);
             let proxyConfig = null;
             let basePath = req.path;
+            let matchedPath = '';
+
             for (const proxy of config.proxies) {
                 if (req.path.startsWith(proxy.prefix)) {
                     proxyConfig = proxy;
+                    matchedPath = proxy.prefix;
                     basePath = req.path.slice(proxy.prefix.length);
+                    console.log(`[代理] 通过主路径匹配: ${proxy.prefix}`);
                     break;
                 }
+                
+                if (proxy.aliases && Array.isArray(proxy.aliases)) {
+                    for (const alias of proxy.aliases) {
+                        if (req.path.startsWith(alias)) {
+                            proxyConfig = proxy;
+                            matchedPath = alias;
+                            basePath = req.path.slice(alias.length);
+                            console.log(`[代理] 通过别名匹配: ${alias} -> ${proxy.prefix}`);
+                            break;
+                        }
+                    }
+                    if (proxyConfig) break;
+                }
             }
+
             if (!proxyConfig) {
                 console.log(`[输出] 未匹配到代理，返回404`);
                 res.status(404).send('Not Found');

@@ -26,6 +26,7 @@
     "proxies": [
         {
             "prefix": "/imlazy/",
+            "aliases": ["/cdn.imlazy.ink/img/background/", "/https://cdn.imlazy.ink/img/background/"],
             "target": "https://cdn.imlazy.ink:233/img/background/",
             "rawRedirect": "https://cdn.imlazy.ink:233/img/background/{path}",
             "description": "个人图床服务(非本人图床，仅作反代并缓存)",
@@ -50,6 +51,7 @@
         },
         {
             "prefix": "/socialify/",
+            "aliases": ["/socialify.git.ci/", "/https://socialify.git.ci/"],
             "target": "https://socialify.git.ci/",
             "rawRedirect": "https://socialify.git.ci/{path}",
             "description": "socialify.git.ci 反代",

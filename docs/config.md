@@ -77,6 +77,10 @@
 - `prefix`: 路径前缀，用于匹配请求
   - 示例: `"/gh/"`
 
+- `aliases`: 路径别名，用于设置可选的访问路径，数组格式
+  - 示例: `["/github/", "/g/"]`
+  - 说明: 通过这些别名也可以访问到相同的目标资源，可以设置多个
+
 - `target`: 目标地址
   - 示例: `"https://cdn.statically.io/gh/"`
 
@@ -122,19 +126,12 @@
     "proxies": [
         {
             "prefix": "/imlazy/",
+            "aliases": ["/cdn.imlazy.ink/img/background/", "/https://cdn.imlazy.ink/img/background/"],
             "target": "https://cdn.imlazy.ink:233/img/background/",
             "rawRedirect": "https://cdn.imlazy.ink:233/img/background/{path}",
             "description": "个人图床服务(非本人图床，仅作反代并缓存)",
             "visible": false,
             "useProxy": false
-        },
-        {
-            "prefix": "/image-oss/",
-            "target": "https://cdn.statically.io/gh/FrecklyComb1728/image-oss@master/",
-            "rawRedirect": "https://cdn.jsdmirror.cn/gh/FrecklyComb1728/image-oss@master/{path}",
-            "description": "个人GitHub OSS图片镜像",
-            "visible": true,
-            "useProxy": true
         }
     ]
 }
@@ -165,7 +162,13 @@
    - 🔴 如遇到SSL证书错误，设置 `httpProxy.rejectUnauthorized` 为 `false` 来忽略证书验证
    - <span style="color:red">**⚠️ 注意：禁用SSL证书验证会降低安全性，只应在信任的环境中使用**</span> 
 
-6. **大图片预览功能**：
+6. **路径别名使用**：
+   - 通过设置 `aliases` 数组，可以为一个代理路径配置多个访问路径
+   - 例如: 配置 `prefix: "/oss/"` 和 `aliases: ["/img/", "/images/"]`，则可以通过 `/oss/file.jpg`, `/img/file.jpg` 或 `/images/file.jpg` 访问相同的资源
+   - 便于设置简短或更直观的URL路径，同时保持原有路径兼容性
+   - 别名匹配的优先级低于主前缀(prefix)，所以如果有冲突，会优先匹配主前缀
+
+7. **大图片预览功能**：
    - 设置 `forceInlineImages` 为 `true` 可以强制大型图片(>10MB)在浏览器中预览
    - 解决了GitHub等站点大图片会自动下载而不是预览的问题
    - 如果不想使用此功能，设置为 `false` 将使用源站原始设置
