@@ -9,7 +9,7 @@
     "cache": {
         "enabled": true,
         "type": "disk",
-        "minSize": "5MB",
+        "minSize": "2MB",
         "maxTime": "2678400S",
         "maxSize": "1024MB",
         "diskPath": ".cache",
@@ -33,7 +33,7 @@
             "useProxy": false
         },
         {
-            "prefix": "/image-oss/",
+            "prefix": "/gh-oss/",
             "target": "https://cdn.statically.io/gh/FrecklyComb1728/image-oss@master/",
             "rawRedirect": "https://cdn.jsdmirror.cn/gh/FrecklyComb1728/image-oss@master/{path}",
             "description": "个人GitHub OSS图片镜像",
@@ -41,10 +41,18 @@
             "useProxy": true
         },
         {
-            "prefix": "/gh/",
-            "target": "http://cdn.statically.io/gh/",
-            "rawRedirect": "https://cdn.jsdmirror.cn/gh/{path}",
-            "description": "statically反代(类jsdelivr静态文件加速)",
+            "prefix": "/oss/",
+            "target": "https://cdn.statically.io/gh/FrecklyComb1728/image-oss@master/image/",
+            "rawRedirect": "https://cdn.jsdmirror.cn/gh/FrecklyComb1728/image-oss@master/{path}",
+            "description": "自建OSS",
+            "visible": true,
+            "useProxy": true
+        },
+        {
+            "prefix": "/socialify/",
+            "target": "https://socialify.git.ci/",
+            "rawRedirect": "https://socialify.git.ci/{path}",
+            "description": "socialify.git.ci 反代",
             "visible": true,
             "useProxy": true
         }

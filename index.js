@@ -13,11 +13,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const FAVICON_PATH = join(__dirname, "public", "favicon.ico");
 const INDEX_FILE = join(__dirname, "public", "index.html");
-const CONFIG_HTML_FILE = join(__dirname, "public", "list.html");
 const CONFIG_FILE = join(__dirname, "index_config.json");
 const CONFIG_ENDPOINT = "/list";
-
 const app = express();
+
+app.use('/assets', express.static(join(__dirname, 'public', 'assets')));
+
 const fallbackConfig = {
   title: "MIFENG CDN代理服务",
   description: "高性能多源CDN代理解决方案",
@@ -27,7 +28,6 @@ const fallbackConfig = {
 const config = await loadConfig(CONFIG_FILE, fallbackConfig);
 const [homepage, configHtml, favicon] = await loadStatics({
   index: INDEX_FILE,
-  configHtml: CONFIG_HTML_FILE,
   favicon: FAVICON_PATH
 });
 const START_TIME = new Date();

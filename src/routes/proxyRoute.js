@@ -141,20 +141,28 @@ export default function proxyRoute(app, config, cacheHeaders, imageCache) {
             }
             const sanitizedPath = basePath.replace(/^[\/]+/, "").replace(/\|/g, "").replace(/[\/]+/g, "/");
             const targetUrl = new URL(sanitizedPath, proxyConfig.target);
+            
+            Object.entries(req.query).forEach(([key, value]) => {
+                if (key !== "raw") {
+                    targetUrl.searchParams.append(key, value);
+                }
+            });
+            
             console.log(`[代理] 目标URL: ${targetUrl}`);
             if (req.query.raw === "true") {
                 let redirectUrl;
                 if (proxyConfig.rawRedirect) {
                     redirectUrl = proxyConfig.rawRedirect.replace("{path}", sanitizedPath);
+                    
+                    const params = new URLSearchParams();
+                    Object.entries(req.query).forEach(([key, value]) => {
+                        if (key !== "raw") params.append(key, value);
+                    });
+                    if (params.toString()) {
+                        redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + params.toString();
+                    }
                 } else {
                     redirectUrl = targetUrl.toString();
-                }
-                const params = new URLSearchParams();
-                Object.entries(req.query).forEach(([key, value]) => {
-                    if (key !== "raw") params.append(key, value);
-                });
-                if (params.toString()) {
-                    redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + params.toString();
                 }
                 return res.redirect(302, redirectUrl);
             } else {
