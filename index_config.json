@@ -6,6 +6,13 @@
     "forceInlineImages": true,
     "host": "localhost",
     "port": 3000,
+    "dns": {
+        "enabled": true,
+        "servers": ["223.5.5.5", "114.114.114.114"],
+        "timeout": 5000,
+        "cacheEnabled": true,
+        "cacheTTL": 3600
+    },
     "cache": {
         "enabled": true,
         "type": "disk",
@@ -27,7 +34,7 @@
         {
             "prefix": "/imlazy/",
             "aliases": ["/cdn.imlazy.ink:233/img/background/", "/https://cdn.imlazy.ink:233/img/background/"],
-            "target": "https://cdn.imlazy.ink:233/img/background/",
+            "target": "https://s4.imlazy.ink:233/img/background/",
             "rawRedirect": "https://cdn.imlazy.ink:233/img/background/{path}",
             "description": "个人图床服务(非本人图床，仅作反代并缓存)",
             "visible": false,
@@ -51,7 +58,7 @@
         },
         {
             "prefix": "/socialify/",
-            "aliases": ["/socialify.git.ci/", "/https://socialify.git.ci/"],
+            "aliases": ["socialify.git.ci/", "https://socialify.git.ci/"],
             "target": "https://socialify.git.ci/",
             "rawRedirect": "https://socialify.git.ci/{path}",
             "description": "socialify.git.ci 反代",

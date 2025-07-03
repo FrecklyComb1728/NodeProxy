@@ -25,11 +25,13 @@ npm start
 - 配置文件位于 `index_config.json`，共享主配置文件。
 - 🔴 <span style="color:red">**不知道怎么配置看[这里](./docs/config.md)**</span> 🔴
 - 🗂️ 了解缓存系统的实现原理看[这里](./docs/cache.md)
+- 🔍 了解DNS解析功能使用方法看[这里](./docs/dns.md)
 
 ## 特性
 
 - Express.js框架
 - 文件缓存支持
+- 自定义DNS解析支持
 - 灵活的代理规则配置
 - 支持多个CDN源
 - HTML和JSON格式的配置查看界面
@@ -49,4 +51,20 @@ npm start
 ```
 
 通过这种方式，不仅可以通过`/oss/image.png`访问图片，还可以使用`/img/image.png`或`/images/image.png`访问相同的资源。
+
+## DNS解析功能
+
+本服务支持自定义DNS解析，可以指定特定的DNS服务器来解析目标域名，这对于提高访问速度或绕过某些网络限制非常有用。
+
+```json
+{
+  "dns": {
+    "enabled": true,
+    "servers": ["8.8.8.8", "1.1.1.1"],
+    "cacheEnabled": true
+  }
+}
+```
+
+详细配置说明见 [DNS解析文档](./docs/dns.md)。
 

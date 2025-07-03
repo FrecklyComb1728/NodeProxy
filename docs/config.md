@@ -96,6 +96,35 @@
 - `useProxy`: 该路径是否使用全局代理
   - 示例: `true`
 
+## DNS解析配置
+
+DNS解析配置项决定了系统如何解析目标域名的IP地址。
+
+```json
+{
+  "dns": {
+    "enabled": true,           // 是否启用DNS解析功能
+    "servers": [               // DNS服务器列表
+      "8.8.8.8",               // 主DNS服务器
+      "1.1.1.1"                // 备用DNS服务器
+    ],
+    "timeout": 5000,           // DNS查询超时时间(毫秒)
+    "cacheEnabled": true,      // 是否启用DNS缓存
+    "cacheTTL": 3600           // 缓存有效期(秒)
+  }
+}
+```
+
+| 配置项 | 类型 | 默认值 | 必填 | 说明 |
+|-------|------|--------|------|------|
+| enabled | boolean | false | 否 | 是否启用自定义DNS解析 |
+| servers | array | ["8.8.8.8", "1.1.1.1"] | 否 | DNS服务器列表 |
+| timeout | number | 5000 | 否 | DNS查询超时时间(毫秒) |
+| cacheEnabled | boolean | true | 否 | 是否启用DNS缓存 |
+| cacheTTL | number | 3600 | 否 | 缓存有效期(秒) |
+
+更多DNS功能的详细说明，请查看[DNS解析文档](./dns.md)。
+
 ## 配置示例
 
 ```json
@@ -133,7 +162,14 @@
             "visible": false,
             "useProxy": false
         }
-    ]
+    ],
+    "dns": {
+        "enabled": true,
+        "servers": ["8.8.8.8", "1.1.1.1"],
+        "timeout": 5000,
+        "cacheEnabled": true,
+        "cacheTTL": 3600
+    }
 }
 ```
 

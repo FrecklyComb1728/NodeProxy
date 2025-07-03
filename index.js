@@ -52,6 +52,8 @@ if (process.env.VERCEL !== '1') {
             const establishTimeStr = formatEstablishTime(config.establishTime);
             const uptimeStr = calculateUptime(config.establishTime);
             const cacheConfig = imageCache.getCacheConfig();
+            const dnsEnabled = config.dns?.enabled === true;
+            const dnsServers = config.dns?.servers || [];
             
             console.log('================= MIFENG CDN代理服务 启动信息 =================');
             console.log(`服务名称: ${config.title}`);
@@ -64,6 +66,12 @@ if (process.env.VERCEL !== '1') {
             console.log(`最大缓存大小: ${cacheConfig.maxSize}`);
             console.log(`缓存时间: ${cacheDays}天`);
             console.log(`支持图片类型: ${imageTypes}`);
+            console.log(`DNS解析: ${dnsEnabled ? '启用' : '禁用'}`);
+            if (dnsEnabled) {
+                console.log(`DNS服务器: ${dnsServers.join(', ')}`);
+                console.log(`DNS缓存: ${config.dns?.cacheEnabled !== false ? '启用' : '禁用'}`);
+                console.log(`DNS缓存时间: ${config.dns?.cacheTTL || 3600}秒`);
+            }
             console.log(`全局代理: ${config.httpProxy?.enabled ? '启用' : '禁用'}`);
             if (config.httpProxy?.enabled) {
               const proxyAddress = config.httpProxy.address + (config.httpProxy.port ? `:${config.httpProxy.port}` : '');

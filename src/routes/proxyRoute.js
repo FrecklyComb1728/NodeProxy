@@ -4,6 +4,7 @@ import { dirname, join } from 'path';
 import fetch from 'node-fetch';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import https from 'node:https';
+import DnsResolver from '../DnsResolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,6 +13,7 @@ const WORKER_PATH = join(__dirname, 'Download.js');
 const ipCache = new Map();
 const workerPool = new Map();
 const MAX_WORKERS = 8;
+let dnsResolver = null;
 
 function getWorker() {
     for (const [id, worker] of workerPool.entries()) {
@@ -57,7 +59,14 @@ function downloadWithWorker(url, proxyConfig) {
             }
         });
 
-        worker.postMessage({ url, proxyConfig });
+        worker.postMessage({ 
+            url, 
+            proxyConfig,
+            dnsConfig: dnsResolver?.enabled ? {
+                enabled: true,
+                servers: dnsResolver.servers
+            } : null
+        });
     });
 }
 
@@ -82,6 +91,21 @@ async function downloadInMainThread(url, proxyConfig) {
         }
     }
 
+    // 使用自定义DNS解析（如果启用）
+    if (dnsResolver?.enabled) {
+        const urlObj = new URL(url);
+        const ip = await dnsResolver.resolve(urlObj.hostname);
+        if (ip) {
+            // 保持原始主机名，但使用解析的IP
+            const originalHost = urlObj.host;
+            urlObj.host = ip;
+            options.headers = options.headers || {};
+            options.headers['Host'] = originalHost;
+            url = urlObj.toString();
+            console.log(`[DNS] 使用自定义DNS解析，${originalHost} -> ${ip}`);
+        }
+    }
+
     const response = await fetch(url, options);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -96,6 +120,11 @@ async function downloadInMainThread(url, proxyConfig) {
 }
 
 export default function proxyRoute(app, config, cacheHeaders, imageCache) {
+    // 初始化DNS解析器
+    if (config.dns?.enabled) {
+        dnsResolver = new DnsResolver(config.dns);
+    }
+    
     function cleanupWorkers() {
         for (const [id, { worker }] of workerPool.entries()) {
             worker.terminate();
