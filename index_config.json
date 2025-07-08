@@ -5,9 +5,9 @@
     "establishTime": "2025/01/13/08/00",
     "forceInlineImages": true,
     "host": "localhost",
-    "port": 3000,
+    "port": 38633,
     "dns": {
-        "enabled": true,
+        "enabled": false,
         "servers": ["223.5.5.5", "114.114.114.114"],
         "timeout": 5000,
         "cacheEnabled": true,
@@ -34,7 +34,7 @@
         {
             "prefix": "/imlazy/",
             "aliases": ["/cdn.imlazy.ink:233/img/background/", "/https://cdn.imlazy.ink:233/img/background/"],
-            "target": "https://s4.imlazy.ink:233/img/background/",
+            "target": "https://s7.imlazy.ink:233/img/background/",
             "rawRedirect": "https://cdn.imlazy.ink:233/img/background/{path}",
             "description": "个人图床服务(非本人图床，仅作反代并缓存)",
             "visible": false,
@@ -50,8 +50,7 @@
         },
         {
             "prefix": "/oss/",
-            "target": "https://cdn.statically.io/gh/FrecklyComb1728/image-oss@master/image/",
-            "rawRedirect": "https://cdn.jsdmirror.cn/gh/FrecklyComb1728/image-oss@master/{path}",
+            "target": "https://qh.oss.bee-zh.cn:50443/oss/",
             "description": "自建OSS",
             "visible": true,
             "useProxy": true
