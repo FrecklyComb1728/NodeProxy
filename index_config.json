@@ -56,6 +56,13 @@
             "useProxy": true
         },
         {
+            "prefix": "/file/",
+            "target": "https://qh.oss.bee-zh.cn:50443/file/",
+            "description": "自建OSS",
+            "visible": true,
+            "useProxy": true
+        },
+        {
             "prefix": "/socialify/",
             "aliases": ["socialify.git.ci/", "https://socialify.git.ci/"],
             "target": "https://socialify.git.ci/",
