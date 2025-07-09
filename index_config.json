@@ -49,8 +49,8 @@
             "useProxy": true
         },
         {
-            "prefix": "/oss/",
-            "target": "https://qh.oss.bee-zh.cn:50443/oss/",
+            "prefix": "/image/",
+            "target": "https://qh.oss.bee-zh.cn:50443/image/",
             "description": "自建OSS",
             "visible": true,
             "useProxy": true
