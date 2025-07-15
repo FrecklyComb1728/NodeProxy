@@ -50,14 +50,14 @@
         },
         {
             "prefix": "/image/",
-            "target": "https://qh.oss.bee-zh.cn:50443/image/",
+            "target": "https://sg.oss.bee-zh.cn/image/",
             "description": "自建OSS",
             "visible": true,
             "useProxy": true
         },
         {
             "prefix": "/file/",
-            "target": "https://qh.oss.bee-zh.cn:50443/file/",
+            "target": "https://sg.oss.bee-zh.cn/file/",
             "description": "自建OSS",
             "visible": true,
             "useProxy": true
