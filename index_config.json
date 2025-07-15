@@ -22,6 +22,9 @@
         "diskPath": ".cache",
         "imageTypes": ["png", "jpg", "jpeg", "gif", "svg", "webp", "bmp", "ico"]
     },
+    "streaming": {
+        "enabled": true
+    },
     "httpProxy": {
         "enabled": false,
         "address": "127.0.0.1",

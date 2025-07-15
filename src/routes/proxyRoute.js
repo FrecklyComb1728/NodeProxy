@@ -33,12 +33,12 @@ function getWorker() {
     return null;
 }
 
-function downloadWithWorker(url, proxyConfig) {
+function downloadWithWorker(url, proxyConfig, res = null, headers = null) {
     return new Promise((resolve, reject) => {
         const workerInfo = getWorker();
         if (!workerInfo) {
             console.log(`[下载] 工作线程已满，使用主线程下载: ${url}`);
-            downloadInMainThread(url, proxyConfig).then(resolve).catch(reject);
+            downloadInMainThread(url, proxyConfig, res, headers).then(resolve).catch(reject);
             return;
         }
 
@@ -48,14 +48,81 @@ function downloadWithWorker(url, proxyConfig) {
             reject(new Error('Download timeout'));
         }, 30000);
 
-        worker.once('message', (result) => {
-            clearTimeout(timeout);
-            workerPool.get(id).busy = false;
-            
+        // 如果提供了响应对象，则使用流式传输
+        const streamMode = !!res;
+        let streamStarted = false;
+        let headersSent = false; // 跟踪响应头是否已发送
+        let bufferChunks = [];
+        
+        worker.on('message', (result) => {
             if (result.error) {
+                clearTimeout(timeout);
+                workerPool.get(id).busy = false;
                 reject(new Error(result.error));
-            } else {
+                return;
+            }
+            
+            // 处理流式传输开始
+            if (result.streamStart) {
+                clearTimeout(timeout); // 清除超时，因为我们现在将通过流处理
+                streamStarted = true;
+                
+                if (res && !headersSent) {
+                    // 确保只设置一次响应头
+                    headersSent = true;
+                    res.status(result.status);
+                    // 设置所有响应头，包括Content-Type和缓存头
+                    res.set('Content-Type', result.contentType);
+                    if (headers) {
+                        res.set(headers);
+                    }
+                    if (result.contentLength) {
+                        res.set('Content-Length', result.contentLength);
+                    }
+                    // 开始发送响应
+                    res.flushHeaders();
+                }
+                return;
+            }
+            
+            // 处理流式数据块
+            if (result.streamChunk && streamStarted) {
+                if (res) {
+                    // 直接发送到客户端
+                    res.write(result.chunk);
+                } else {
+                    // 如果没有响应对象，则收集块以便稍后处理
+                    bufferChunks.push(result.chunk);
+                }
+                return;
+            }
+            
+            // 处理流结束
+            if (result.streamEnd && streamStarted) {
+                workerPool.get(id).busy = false;
+                
+                if (res) {
+                    // 结束响应
+                    res.end();
+                    resolve({ streamed: true });
+                } else {
+                    // 合并所有块并解析
+                    const buffer = Buffer.concat(bufferChunks);
+                    resolve({ 
+                        buffer, 
+                        contentType: result.contentType, 
+                        status: result.status 
+                    });
+                }
+                return;
+            }
+            
+            // 处理非流式响应（完整缓冲区）
+            if (result.buffer) {
+                clearTimeout(timeout);
+                workerPool.get(id).busy = false;
                 resolve(result);
+                return;
             }
         });
 
@@ -65,12 +132,13 @@ function downloadWithWorker(url, proxyConfig) {
             dnsConfig: dnsResolver?.enabled ? {
                 enabled: true,
                 servers: dnsResolver.servers
-            } : null
+            } : null,
+            streamMode
         });
     });
 }
 
-async function downloadInMainThread(url, proxyConfig) {
+async function downloadInMainThread(url, proxyConfig, res = null, headers = null) {
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
@@ -111,6 +179,37 @@ async function downloadInMainThread(url, proxyConfig) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
     
+    // 如果提供了响应对象，则使用流式传输
+    if (res) {
+        res.status(response.status);
+        res.set('Content-Type', response.headers.get('content-type'));
+        
+        // 设置缓存头
+        if (headers) {
+            res.set(headers);
+        }
+        
+        const contentLength = response.headers.get('content-length');
+        if (contentLength) {
+            res.set('Content-Length', contentLength);
+        }
+        
+        // 将响应流直接传输到客户端
+        response.body.pipe(res);
+        
+        // 返回一个Promise，当流完成时解析
+        return new Promise((resolve, reject) => {
+            response.body.on('end', () => {
+                resolve({ streamed: true });
+            });
+            
+            response.body.on('error', (err) => {
+                reject(err);
+            });
+        });
+    }
+    
+    // 如果没有响应对象，则返回完整缓冲区
     const buffer = await response.buffer();
     return {
         buffer,
@@ -227,22 +326,39 @@ export default function proxyRoute(app, config, cacheHeaders, imageCache) {
                 const proxySettings = useProxy ? config.httpProxy : null;
 
                 try {
-                    const result = await downloadWithWorker(targetUrl.toString(), proxySettings);
-                    let { buffer, contentType, status } = result;
-                    if (!(buffer instanceof Buffer)) {
-                        buffer = Buffer.from(buffer);
-                    }
                     const ext = req.path.split('.').pop()?.toLowerCase() || '';
+                    const useStreaming = config.streaming?.enabled !== false;
+                    
+                    // 检查是否应该使用流式传输
+                    if (useStreaming) {
+                        console.log(`[代理] 使用流式传输: ${targetUrl}`);
+                        // 注意：不在这里设置cacheHeaders，而是在worker消息处理中设置
+                        
+                        // 直接将响应流式传输到客户端
+                        const result = await downloadWithWorker(targetUrl.toString(), proxySettings, res, cacheHeaders);
+                        
+                        // 如果是大文件且可缓存，在后台异步缓存
+                        if (result.buffer && config.cache?.enabled && imageCache.isCacheable(ext, result.buffer.length)) {
+                            console.log(`[缓存] 后台存储 ${req.path} (${imageCache.formatSize(result.buffer.length)})`);                            imageCache.set(req, result.buffer, result.contentType).catch(err => {
+                                console.error(`[缓存] 存储失败: ${err.message}`);
+                            });
+                        }
+                    } else {
+                        // 使用传统方式下载完整文件
+                        const result = await downloadWithWorker(targetUrl.toString(), proxySettings);
+                        let { buffer, contentType, status } = result;
+                        if (!(buffer instanceof Buffer)) {
+                            buffer = Buffer.from(buffer);
+                        }
 
-                    if (config.cache?.enabled && imageCache.isCacheable(ext, buffer.length)) {
-                        console.log(`[缓存] 存储 ${req.path} (${imageCache.formatSize(buffer.length)})`);
-                        await imageCache.set(req, buffer, contentType);
+                        if (config.cache?.enabled && imageCache.isCacheable(ext, buffer.length)) {
+                            console.log(`[缓存] 存储 ${req.path} (${imageCache.formatSize(buffer.length)})`);                            await imageCache.set(req, buffer, contentType);
+                        }
+
+                        res.set("Content-Type", contentType);
+                        res.set(cacheHeaders);
+                        res.end(buffer);
                     }
-
-                    res.set("Content-Type", contentType);
-                    res.set(cacheHeaders);
-                    res.end(buffer);
-
                 } catch (error) {
                     console.error(`[错误] 下载失败: ${error.message}`);
                     res.status(500).send('Internal Server Error');

@@ -26,11 +26,13 @@ npm start
 - 🔴 <span style="color:red">**不知道怎么配置看[这里](./docs/config.md)**</span> 🔴
 - 🗂️ 了解缓存系统的实现原理看[这里](./docs/cache.md)
 - 🔍 了解DNS解析功能使用方法看[这里](./docs/dns.md)
+- 🚀 了解流式传输功能使用方法看[这里](./docs/streaming.md)
 
 ## 特性
 
 - Express.js框架
 - 文件缓存支持
+- 流式传输支持（边下载边发送）
 - 自定义DNS解析支持
 - 灵活的代理规则配置
 - 支持多个CDN源

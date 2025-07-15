@@ -23,7 +23,10 @@ const fallbackConfig = {
   title: "MIFENG CDN代理服务",
   description: "高性能多源CDN代理解决方案",
   footer: "© 2025 Mifeng CDN服务 | 提供稳定快速的资源访问",
-  proxies: []
+  proxies: [],
+  streaming: {
+    enabled: true
+  }
 };
 const config = await loadConfig(CONFIG_FILE, fallbackConfig);
 const [homepage, configHtml, favicon] = await loadStatics({
@@ -66,6 +69,7 @@ if (process.env.VERCEL !== '1') {
             console.log(`最大缓存大小: ${cacheConfig.maxSize}`);
             console.log(`缓存时间: ${cacheDays}天`);
             console.log(`支持图片类型: ${imageTypes}`);
+            console.log(`流式传输: ${config.streaming?.enabled !== false ? '启用' : '禁用'}`);
             console.log(`DNS解析: ${dnsEnabled ? '启用' : '禁用'}`);
             if (dnsEnabled) {
                 console.log(`DNS服务器: ${dnsServers.join(', ')}`);
