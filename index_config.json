@@ -22,9 +22,6 @@
         "diskPath": ".cache",
         "imageTypes": ["png", "jpg", "jpeg", "gif", "svg", "webp", "bmp", "ico"]
     },
-    "streaming": {
-        "enabled": true
-    },
     "httpProxy": {
         "enabled": false,
         "address": "127.0.0.1",
@@ -45,7 +42,7 @@
         },
         {
             "prefix": "/gh-oss/",
-            "target": "https://cdn.statically.io/gh/FrecklyComb1728/image-oss@master/",
+            "target": "https://cdn.jsdelivr.net/gh/FrecklyComb1728/image-oss@master/",
             "rawRedirect": "https://cdn.jsdmirror.cn/gh/FrecklyComb1728/image-oss@master/{path}",
             "description": "个人GitHub OSS图片镜像",
             "visible": true,
@@ -53,14 +50,14 @@
         },
         {
             "prefix": "/image/",
-            "target": "https://sg.oss.bee-zh.cn/image/",
+            "target": "https://hk.oss.bee-zh.cn/image/",
             "description": "自建OSS",
             "visible": true,
             "useProxy": true
         },
         {
             "prefix": "/file/",
-            "target": "https://sg.oss.bee-zh.cn/file/",
+            "target": "https://hk.oss.bee-zh.cn/file/",
             "description": "自建OSS",
             "visible": true,
             "useProxy": true
