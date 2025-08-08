@@ -5,7 +5,7 @@
     "establishTime": "2025/01/13/08/00",
     "forceInlineImages": true,
     "host": "localhost",
-    "port": 38633,
+    "port": 3000,
     "dns": {
         "enabled": false,
         "servers": ["223.5.5.5", "114.114.114.114"],
@@ -15,7 +15,7 @@
     },
     "cache": {
         "enabled": true,
-        "type": "disk",
+        "type": "memory",
         "minSize": "2MB",
         "maxTime": "2678400S",
         "maxSize": "1024MB",
