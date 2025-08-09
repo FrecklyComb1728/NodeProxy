@@ -67,20 +67,25 @@ function downloadWithWorker(url, proxyConfig, res = null, headers = null) {
                 clearTimeout(timeout); // 清除超时，因为我们现在将通过流处理
                 streamStarted = true;
                 
-                if (res && !headersSent) {
-                    // 确保只设置一次响应头
-                    headersSent = true;
-                    res.status(result.status);
-                    // 设置所有响应头，包括Content-Type和缓存头
-                    res.set('Content-Type', result.contentType);
-                    if (headers) {
-                        res.set(headers);
+                // 只有在响应头未发送时才设置响应头
+                if (res && !headersSent && !res.headersSent) {
+                    try {
+                        // 确保只设置一次响应头
+                        headersSent = true;
+                        res.status(result.status);
+                        // 设置所有响应头，包括Content-Type和缓存头
+                        res.set('Content-Type', result.contentType);
+                        if (headers) {
+                            res.set(headers);
+                        }
+                        if (result.contentLength) {
+                            res.set('Content-Length', result.contentLength);
+                        }
+                        // 开始发送响应
+                        res.flushHeaders();
+                    } catch (err) {
+                        console.error('[错误] 设置响应头失败:', err.message);
                     }
-                    if (result.contentLength) {
-                        res.set('Content-Length', result.contentLength);
-                    }
-                    // 开始发送响应
-                    res.flushHeaders();
                 }
                 return;
             }

@@ -106,11 +106,11 @@ parentPort.on('message', async ({ url, proxyConfig, dnsConfig, streamMode }) => 
             const chunkSize = 64 * 1024; // 64KB 块大小
             
             stream.on('data', (chunk) => {
-                // 发送数据块
+                // 发送数据块 - 不使用transferList以避免Buffer边界问题
                 parentPort.postMessage({
                     streamChunk: true,
-                    chunk: chunk
-                }, [chunk.buffer]);
+                    chunk: Buffer.from(chunk) // 创建新的Buffer副本
+                });
             });
             
             stream.on('end', () => {
@@ -122,12 +122,12 @@ parentPort.on('message', async ({ url, proxyConfig, dnsConfig, streamMode }) => 
                 parentPort.postMessage({ error: err.message });
             });
         } else if (result.buffer) {
-            // 非流式模式，发送完整缓冲区
+            // 非流式模式，发送完整缓冲区 - 不使用transferList
             parentPort.postMessage({
-                buffer: result.buffer,
+                buffer: Buffer.from(result.buffer), // 创建新的Buffer副本
                 contentType: result.contentType,
                 status: result.status
-            }, [result.buffer.buffer]);
+            });
         }
     } catch (error) {
         parentPort.postMessage({ error: error.message });
