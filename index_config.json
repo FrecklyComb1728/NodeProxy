@@ -5,7 +5,7 @@
     "establishTime": "2025/01/13/08/00",
     "forceInlineImages": true,
     "host": "localhost",
-    "port": 3000,
+    "port": 38633,
     "dns": {
         "enabled": false,
         "servers": ["223.5.5.5", "114.114.114.114"],
